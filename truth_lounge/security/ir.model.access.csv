@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+ticket_user,Preparation read,model_truth_ticket,group_operator,1,0,0,0
+ticket_manager,Preparation manager,model_truth_ticket,group_manager,1,0,0,0
+ticket_admin,Preparation admin,model_truth_ticket,base.group_system,1,1,1,1
+booking_manager,Reservation manager,model_truth_booking,group_manager,1,1,1,1
+booking_admin,Reservation admin,model_truth_booking,base.group_system,1,1,1,1
+gallery_manager,Gallery manager,model_truth_gallery,group_manager,1,1,1,1
+gallery_admin,Gallery admin,model_truth_gallery,base.group_system,1,1,1,1
