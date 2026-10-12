@@ -5,3 +5,101 @@
 @media(max-width:640px){.truth-container{width:88%}.truth-hero-grid{grid-template-columns:1fr}.truth-hero-copy{padding:52px 0 0}.truth-hero h1{font-size:55px}.truth-brand-art{margin:-5px -8vw 0;max-height:460px;overflow:hidden}.truth-brand-art img{width:100%;max-width:none}.truth-hero-note{margin-top:28px}.truth-hero-copy p{font-size:15px}.truth-ribbon{gap:18px;font-size:8px;white-space:nowrap;overflow:hidden}.truth-ribbon span:last-child,.truth-ribbon span:nth-child(4){display:none}.truth-three,.truth-two{grid-template-columns:1fr}.truth-section-heading{display:block;margin-bottom:28px}.truth-section-heading>p{max-width:none}.truth-section{padding:58px 0}.truth-experience{padding:32px}.truth-experience .truth-symbol{margin-bottom:22px}.truth-product-grid{gap:16px}.truth-product-image{height:170px}.truth-product h3{font-size:23px}.truth-contact-band>.truth-container{display:block}.truth-contact-band .truth-button{margin-top:25px}.truth-about-art{max-width:420px;margin:auto}.truth-gallery{grid-template-columns:1fr}.truth-panel{padding:25px 20px}.truth-social-card{padding:28px}.truth-page h1{font-size:50px}.truth-site header .navbar-brand img{max-height:62px}.truth-actions{gap:22px}.truth-page h2{font-size:38px}}
 @media(prefers-reduced-motion:reduce){.truth-site *{transition:none!important;scroll-behavior:auto!important}}
 .truth-site #wrap:not(.truth-page){background:#faf8f3;color:#24221e}.truth-site header .offcanvas,.truth-site header .dropdown-menu{background:#151511;color:#f5efe3}.truth-site header .dropdown-menu a{color:#f5efe3}.truth-site header .dropdown-menu a:hover{background:#29271f;color:#d5b16f}
+
+/* Homepage photography: normal image elements remain editable in Odoo. */
+.truth-hero-grid{min-height:640px}
+.truth-experience.truth-photo-card{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.truth-card-image{overflow:hidden;aspect-ratio:4/3;background:#24221d}
+.truth-card-image img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.truth-photo-card:hover .truth-card-image img{transform:scale(1.035)}
+.truth-card-copy{padding:30px;flex:1;display:flex;flex-direction:column;align-items:flex-start}
+.truth-card-copy .truth-text-link{margin-top:auto}
+.truth-page #karaoke,.truth-page #cocktails{scroll-margin-top:100px}
+.truth-karaoke{display:grid;grid-template-columns:1fr 1fr;background:#201d17;border-top:1px solid #d5b16f33;border-bottom:1px solid #d5b16f33}
+.truth-karaoke-visual{position:relative;min-height:590px;overflow:hidden}
+.truth-karaoke-visual>img{display:block;width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:50% 50%}
+.truth-karaoke-visual::after{content:"";position:absolute;inset:55% 0 0;background:linear-gradient(transparent,#070b09d9);pointer-events:none}
+.truth-photo-caption{position:absolute;bottom:35px;left:10%;z-index:1;color:#f5efe3;letter-spacing:.23em;font-size:10px}
+.truth-karaoke-copy{padding:76px clamp(30px,5vw,88px);align-self:center}
+.truth-karaoke-copy h2{font-size:clamp(38px,4.4vw,64px)}
+.truth-karaoke-copy p{max-width:520px;color:#d0c6b7}
+.truth-karaoke-copy .truth-karaoke-details{font-size:12px;color:#b6aa95;margin:25px 0 0}
+.truth-photo-banner{position:relative;isolation:isolate;min-height:550px;display:flex;align-items:center;overflow:hidden;background:#171711}
+.truth-photo-banner .truth-banner-image{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:70% 52%;z-index:-2}
+.truth-banner-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,10,8,.94) 0%,rgba(9,10,8,.77) 40%,rgba(9,10,8,.08) 100%);z-index:-1;pointer-events:none}
+.truth-banner-content{padding-block:90px}
+.truth-banner-content h2{max-width:700px;font-size:clamp(38px,4.5vw,66px);color:#fff6e8}
+.truth-banner-content p{max-width:420px;color:#ded5c7}
+.truth-site #truth-footer,.truth-site #truth-footer h4,.truth-site #truth-footer p{color:#eee5d5!important}
+.truth-site #truth-footer a{color:#dfbe80!important;line-height:2}
+.truth-site #truth-footer a:hover{color:#fff0d0!important}
+.truth-site .o_footer_copyright,.truth-site .o_footer_copyright .text-muted{color:#bcb3a4!important}
+@media(max-width:991px){
+ .truth-hero-grid{min-height:0}
+ .truth-card-copy{padding:24px}
+ .truth-karaoke-copy{padding:48px 30px}
+ .truth-karaoke-visual{min-height:540px}
+ .truth-karaoke-copy .truth-actions{gap:20px}
+ .truth-photo-banner{min-height:480px}
+}
+@media(max-width:640px){
+ .truth-card-image{aspect-ratio:16/10}
+ .truth-card-copy{padding:27px}
+ .truth-karaoke{grid-template-columns:1fr}
+ .truth-karaoke-visual{min-height:0;height:320px}
+ .truth-karaoke-copy{padding:42px 6% 48px}
+ .truth-photo-caption{left:6%;bottom:24px}
+ .truth-karaoke-copy h2{font-size:43px}
+ .truth-photo-banner{min-height:550px;align-items:flex-end}
+ .truth-photo-banner .truth-banner-image{object-position:65% 50%}
+ .truth-banner-shade{background:linear-gradient(0deg,rgba(9,10,8,.97),rgba(9,10,8,.75) 55%,rgba(9,10,8,.14))}
+ .truth-banner-content{padding-block:170px 46px}
+ .truth-banner-content h2{font-size:40px}
+}
+
+/* Native Odoo controls, scoped to this website. Odoo 19 uses unprefixed Bootstrap variables. */
+#wrapwrap.truth-site{
+ --primary:#d5b16f;--primary-rgb:213,177,111;--secondary:#756348;--secondary-rgb:117,99,72;
+ --link-color:#826129;--link-color-rgb:130,97,41;--link-hover-color:#604515;--link-hover-color-rgb:96,69,21;
+ --bs-primary:#d5b16f;--bs-primary-rgb:213,177,111;--bs-link-color:#826129;--bs-link-hover-color:#604515;
+}
+#wrapwrap.truth-site .btn-primary{
+ --btn-bg:#d5b16f;--btn-border-color:#d5b16f;--btn-color:#17130c;
+ --btn-hover-bg:#e7c58a;--btn-hover-border-color:#e7c58a;--btn-hover-color:#17130c;
+ --btn-active-bg:#c59c55;--btn-active-border-color:#c59c55;--btn-active-color:#17130c;
+ --btn-disabled-bg:#d5b16f;--btn-disabled-border-color:#d5b16f;--btn-disabled-color:#17130c;
+ --btn-focus-shadow-rgb:213,177,111;
+ background-color:#d5b16f!important;border-color:#d5b16f!important;color:#17130c!important;
+}
+#wrapwrap.truth-site .btn-primary:hover{background-color:#e7c58a!important;border-color:#e7c58a!important}
+#wrapwrap.truth-site .btn-primary:active,#wrapwrap.truth-site .btn-primary.active{background-color:#c59c55!important;border-color:#c59c55!important}
+#wrapwrap.truth-site .btn-secondary{background-color:#756348!important;border-color:#756348!important;color:#fff7e9!important}
+#wrapwrap.truth-site .btn-outline-primary{color:#826129!important;border-color:#a87c36!important;background-color:transparent}
+#wrapwrap.truth-site .btn-outline-primary:hover,#wrapwrap.truth-site .btn-outline-primary.active{color:#17130c!important;background-color:#d5b16f!important;border-color:#d5b16f!important}
+#wrapwrap.truth-site .text-primary,#wrapwrap.truth-site .link-primary,#wrapwrap.truth-site .btn-link{color:#826129!important}
+#wrapwrap.truth-site .bg-primary,#wrapwrap.truth-site .text-bg-primary,#wrapwrap.truth-site .badge.bg-primary{background-color:#d5b16f!important;color:#17130c!important}
+#wrapwrap.truth-site .border-primary{border-color:#d5b16f!important}
+#wrapwrap.truth-site .nav-pills .nav-link.active,#wrapwrap.truth-site .page-item.active .page-link{background-color:#d5b16f!important;border-color:#d5b16f!important;color:#17130c!important}
+#wrapwrap.truth-site .page-link{color:#826129}
+#wrapwrap.truth-site .form-check-input:checked{background-color:#967132;border-color:#967132}
+#wrapwrap.truth-site .form-control:focus,#wrapwrap.truth-site .form-select:focus,#wrapwrap.truth-site .form-check-input:focus{border-color:#b18c48;box-shadow:0 0 0 .2rem #d5b16f40}
+#wrapwrap.truth-site .btn:focus-visible{box-shadow:0 0 0 .2rem #d5b16f60}
+#wrapwrap.truth-site #top,#wrapwrap.truth-site #top .navbar,#wrapwrap.truth-site #top .o_navbar_mobile{
+ color:#f5efe3!important;--navbar-color:#f5efe3;--navbar-hover-color:#d5b16f;--navbar-active-color:#d5b16f;
+ --nav-link-color:#f5efe3;--nav-link-hover-color:#d5b16f;--nav-active-color:#d5b16f;
+ --NavLinkWithBackground-bg-color:#d5b16f18;--NavLinkWithBackground-bg-color--hover:#d5b16f30;
+}
+#wrapwrap.truth-site #top .nav-link,#wrapwrap.truth-site #top .nav-link>*,
+#wrapwrap.truth-site #top .o_header_mobile_buttons_wrap,#wrapwrap.truth-site #top .text-reset,
+#wrapwrap.truth-site #top .o_wsale_my_cart a,#wrapwrap.truth-site #top .o_wsale_my_cart .fa-shopping-cart,
+#wrapwrap.truth-site #top button[data-bs-toggle="offcanvas"],#wrapwrap.truth-site #top .navbar-toggler{color:#f5efe3!important}
+#wrapwrap.truth-site #top .o_header_mobile .navbar-toggler-icon{color:#f5efe3!important;background-color:#f5efe3!important;background-image:none!important;opacity:1}
+#wrapwrap.truth-site #top .o_wsale_my_cart .my_cart_quantity{background-color:#d5b16f!important;color:#17130c!important}
+#wrapwrap.truth-site #top .offcanvas,#wrapwrap.truth-site #top .dropdown-menu{background-color:#151511!important;color:#f5efe3!important}
+#wrapwrap.truth-site #top .offcanvas .btn-close{filter:invert(1);opacity:1}
+#wrapwrap.truth-site #top .dropdown-item,#wrapwrap.truth-site #top .offcanvas .dropdown-item{color:#f5efe3!important}
+#wrapwrap.truth-site #top .dropdown-item:hover,#wrapwrap.truth-site #top .dropdown-item:focus{background-color:#30291c!important;color:#edcb8e!important}
+#wrapwrap.truth-site #top .btn-primary,#wrapwrap.truth-site #top .btn-primary>*{color:#17130c!important}
+#wrapwrap.truth-site #truth-footer,#wrapwrap.truth-site #truth-footer h4,#wrapwrap.truth-site #truth-footer p{color:#eee5d5!important}
+#wrapwrap.truth-site #truth-footer a{color:#dfbe80!important}
+#wrapwrap.truth-site .o_footer_copyright,#wrapwrap.truth-site .o_footer_copyright .text-muted,#wrapwrap.truth-site .o_footer_copyright span{color:#bcb3a4!important}

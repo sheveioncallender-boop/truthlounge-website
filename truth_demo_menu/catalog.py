@@ -1,0 +1,21 @@
+"""Illustrative menu data only. Prices are in the selected company's currency."""
+PRODUCTS = (
+    {'key': 'ribs', 'name': 'BBQ Ribs & Fries', 'price': 120.0, 'station': 'kitchen',
+     'image': 'truth_lounge/static/src/img/truth-food.jpg',
+     'description': 'Barbecue ribs with fries and fresh sides.'},
+    {'key': 'burger', 'name': 'Classic Beef Burger', 'price': 65.0, 'station': 'kitchen',
+     'image': 'truth_demo_menu/static/src/img/burger.jpg',
+     'description': 'A beef burger with cheese, lettuce, tomato, pickles and sauce.'},
+    {'key': 'wings', 'name': 'Glazed Chicken Wings', 'price': 75.0, 'station': 'kitchen',
+     'image': 'truth_demo_menu/static/src/img/wings.jpg',
+     'description': 'Glazed chicken wings with a dipping sauce.'},
+    {'key': 'whiskey', 'name': 'Citrus Whiskey Cocktail', 'price': 55.0, 'station': 'bar',
+     'image': 'truth_lounge/static/src/img/truth-cocktails.jpg',
+     'description': 'A whiskey cocktail served over ice with a citrus garnish.'},
+    {'key': 'mojito', 'name': 'Classic Mojito', 'price': 50.0, 'station': 'bar',
+     'image': 'truth_demo_menu/static/src/img/mojito.jpg',
+     'description': 'A refreshing rum cocktail with lime, mint and soda.'},
+    {'key': 'lemonade', 'name': 'Fresh Lemonade', 'price': 25.0, 'station': 'bar',
+     'image': 'truth_demo_menu/static/src/img/lemonade.jpg',
+     'description': 'A chilled citrus lemonade. Non-alcoholic.'},
+)

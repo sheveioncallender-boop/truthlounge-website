@@ -5,13 +5,14 @@ from pathlib import Path
 from lxml import etree
 
 ROOT = Path(__file__).parents[1]
-modules = ['truth_lounge', 'truth_kitchen_display']
+modules = ['truth_lounge', 'truth_kitchen_display', 'truth_demo_menu']
 ids = set()
 references = []
 for module in modules:
     folder = ROOT / module
     manifest = ast.literal_eval((folder / '__manifest__.py').read_text())
-    assert not set(modules) & set(manifest['depends']), 'The two apps must be independent'
+    if module != 'truth_demo_menu':
+        assert not set(modules) & set(manifest['depends']), 'The two main apps must be independent'
     if module == 'truth_lounge':
         assert not any(x in manifest['depends'] for x in ['pos_restaurant', 'point_of_sale'])
     for path in folder.rglob('*.py'):

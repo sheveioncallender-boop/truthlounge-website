@@ -21,6 +21,27 @@ Neither app depends on the other. Kitchen display requires native Restaurant POS
 
 Do not run a blanket upgrade before installing the new kitchen module. Complete both steps before resuming service. Existing native POS/Sales/Inventory applications remain installed; the split does not uninstall them.
 
+## Optional demo menu for testing
+
+After upgrading Truth Website to **19.0.2.1.0**, update the Apps list and install **Truth Demo Menu** (`truth_demo_menu`). Install this separately only when you want test products. It requires both Truth apps and exactly one branded website in the active company. It does not rely on Odoo's database-level demo-data switch.
+
+| Product | Demo list price | Station |
+| --- | ---: | --- |
+| BBQ Ribs & Fries | 120.00 | Kitchen |
+| Classic Beef Burger | 65.00 | Kitchen |
+| Glazed Chicken Wings | 75.00 | Kitchen |
+| Citrus Whiskey Cocktail | 55.00 | Bar |
+| Classic Mojito | 50.00 | Bar |
+| Fresh Lemonade | 25.00 | Bar |
+
+These are sample prices in the company's existing currency (TTD if that company is configured for TTD), not a verified Truth price list. Existing default taxes and pricelists determine the displayed/final amount. No currency, VAT rate or payment configuration is changed.
+
+The six products have images, internal references beginning `TRUTH-DEMO-`, Food/Drinks website categories, Truth Demo Food/Drinks POS categories, and Kitchen/Bar preparation routing. They are published to the selected website and available in POS. Find them under **Truth Website → Demo Menu** or search products for `TRUTH-DEMO-`.
+
+To test, reload the POS catalog and add a food and a drink through the normal POS workflow. Select that register in **Truth Kitchen Display → Displays**. If POS or display category filters are enabled, include the new demo categories. For website tests, enable **Include confirmed website orders** on the display. Native order confirmation still determines when website orders appear. No test orders or payments are created automatically.
+
+Demo products are goods without inventory tracking. There are no stock balances, BOMs, recipes or automatic ingredient consumption. Existing products and register settings are not modified. Before real trading, unpublish/archive the demo products, or replace their names, prices, descriptions and photos with approved menu data. If a demo product has been used on an order, archive it rather than deleting it. Repeated setup does not overwrite edited demo products.
+
 ## Fresh installation
 
 Install either or both apps from Apps. The website activates automatically when the database has one website. The kitchen app creates an initial screen with no registers selected; configure it before service.
@@ -44,6 +65,14 @@ Screens showing the same item share preparation progress. Kitchen and bar items 
 The display reads server-saved POS orders from the last 48 hours and source orders for open preparation items. Offline/unsynchronized edits appear after Odoo syncs. Selecting an existing register may show recent historical orders; review the queue before service. Website orders enter only after native sale confirmation. Old `/truth/kitchen` bookmarks now open the display list; live boards use `/truth/kitchen/<display_id>`.
 
 Grant staff **Preparation Display User** for operation or **Kitchen Display Manager** for configuration and preparation dismissal. Assign their ordinary native POS/Sales roles separately as appropriate. Administrator access is supported. Records are restricted by company. Dismissing preparation requires a reason and does not cancel/refund the native order.
+
+## Homepage photo and karaoke update (19.0.2.1.0)
+
+After the module split is already installed, rebuild/restart in Cloudpepper and upgrade **Truth Website** only. This update does not touch the kitchen module or operational flows.
+
+Native mobile cart/menu icons now use visible ivory, primary controls use gold, footer text uses ivory/gold, and the Truth footer no longer renders Powered by Odoo. The homepage now includes food/drink/karaoke photo cards, a dedicated karaoke banner, a full-width cocktail banner, and links to table requests and the official Facebook page for upcoming karaoke nights. Images are regular Odoo-editable image elements inside the homepage structure. Replace them through **Website → Edit → select image → Replace**. No recurring event, time, price or promotion is created.
+
+The three added photos are illustrative Unsplash stock photography, not photographs of the Truth venue or verified Truth menu items. The supplied Truth brand artwork stays unchanged. Image sources and licensing are recorded in `truth_lounge/static/src/img/SOURCES.md`.
 
 ## Website configuration
 
