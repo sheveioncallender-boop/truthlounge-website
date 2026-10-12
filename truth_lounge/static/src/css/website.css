@@ -93,7 +93,7 @@
 #wrapwrap.truth-site #top .o_header_mobile_buttons_wrap,#wrapwrap.truth-site #top .text-reset,
 #wrapwrap.truth-site #top .o_wsale_my_cart a,#wrapwrap.truth-site #top .o_wsale_my_cart .fa-shopping-cart,
 #wrapwrap.truth-site #top button[data-bs-toggle="offcanvas"],#wrapwrap.truth-site #top .navbar-toggler{color:#f5efe3!important}
-#wrapwrap.truth-site #top .o_header_mobile .navbar-toggler-icon{color:#f5efe3!important;background-color:#f5efe3!important;background-image:none!important;opacity:1}
+
 #wrapwrap.truth-site #top .o_wsale_my_cart .my_cart_quantity{background-color:#d5b16f!important;color:#17130c!important}
 #wrapwrap.truth-site #top .offcanvas,#wrapwrap.truth-site #top .dropdown-menu{background-color:#151511!important;color:#f5efe3!important}
 #wrapwrap.truth-site #top .offcanvas .btn-close{filter:invert(1);opacity:1}
@@ -103,3 +103,47 @@
 #wrapwrap.truth-site #truth-footer,#wrapwrap.truth-site #truth-footer h4,#wrapwrap.truth-site #truth-footer p{color:#eee5d5!important}
 #wrapwrap.truth-site #truth-footer a{color:#dfbe80!important}
 #wrapwrap.truth-site .o_footer_copyright,#wrapwrap.truth-site .o_footer_copyright .text-muted,#wrapwrap.truth-site .o_footer_copyright span{color:#bcb3a4!important}
+
+/* Photo-led welcome: the official logo remains in Odoo's navigation header. */
+.truth-hero.truth-hero-photo{position:relative;isolation:isolate;background:#10100f;overflow:hidden}
+.truth-hero-photo .truth-hero-photo-image{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:65% 52%;z-index:-2}
+.truth-hero-photo-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,9,7,.96),rgba(8,9,7,.81) 36%,rgba(8,9,7,.2) 78%);z-index:-1;pointer-events:none}
+.truth-hero-photo .truth-hero-grid{display:flex;min-height:650px;align-items:center}
+.truth-hero-photo .truth-hero-copy{max-width:650px;padding:80px 0}
+.truth-hero-photo .truth-hero-copy p{color:#e1d9cc}
+.truth-hero-photo .truth-hero-note{color:#e1d3ba}
+/* Explicit SVG artwork avoids font and mask rendering differences.
+   The original Odoo links, toggle attributes and cart badge are retained. */
+#wrapwrap.truth-site #top .navbar-toggler-icon{
+ display:inline-block!important;width:26px!important;height:26px!important;flex:0 0 26px;
+ background:transparent url('/truth_lounge/static/src/img/truth-menu-icon.svg') center/26px 26px no-repeat!important;
+ -webkit-mask:none!important;mask:none!important;filter:none!important;opacity:1!important;vertical-align:middle;
+}
+#wrapwrap.truth-site #top .o_wsale_my_cart .fa-shopping-cart{
+ display:inline-block!important;width:26px!important;height:26px!important;
+ background:transparent url('/truth_lounge/static/src/img/truth-cart-icon.svg') center/26px 26px no-repeat!important;
+ font-size:0!important;line-height:1!important;-webkit-mask:none!important;mask:none!important;
+ filter:none!important;opacity:1!important;vertical-align:middle;
+}
+#wrapwrap.truth-site #top .o_wsale_my_cart .fa-shopping-cart::before,
+#wrapwrap.truth-site #top .o_wsale_my_cart .fa-shopping-cart::after{content:none!important}
+#wrapwrap.truth-site #top .o_header_mobile .o_wsale_my_cart>a,
+#wrapwrap.truth-site #top .o_header_mobile button[data-bs-target="#top_menu_collapse_mobile"]{
+ display:inline-flex;align-items:center;justify-content:center;min-width:46px;min-height:46px;
+ padding:9px!important;border:1px solid #d5b16f55!important;border-radius:10px!important;
+ background:#231f17!important;color:#d5b16f!important;line-height:1;
+}
+#wrapwrap.truth-site #top .o_header_mobile .o_wsale_my_cart>a:hover,
+#wrapwrap.truth-site #top .o_header_mobile button[data-bs-target="#top_menu_collapse_mobile"]:hover{background:#382e1d!important}
+#wrapwrap.truth-site #top .o_header_mobile .o_header_mobile_buttons_wrap{gap:10px!important;margin-right:10px}
+#wrapwrap.truth-site #top .o_header_mobile .o_wsale_my_cart .my_cart_quantity{
+ font-size:10px;line-height:1;min-width:17px;padding:3px 4px;border:1px solid #151511;
+}
+@media(max-width:640px){
+ .truth-hero-photo .truth-hero-grid{min-height:660px;align-items:flex-end}
+ .truth-hero-photo .truth-hero-copy{padding:235px 0 46px;max-width:100%}
+ .truth-hero-photo .truth-hero-photo-image{object-position:64% 35%}
+ .truth-hero-photo-shade{background:linear-gradient(0deg,rgba(8,9,7,.99),rgba(8,9,7,.85) 48%,rgba(8,9,7,.12) 100%)}
+ .truth-hero-photo .truth-hero-note{margin-top:30px}
+ .truth-hero-photo .truth-hero-copy h1{font-size:clamp(42px,11.8vw,55px)}
+}

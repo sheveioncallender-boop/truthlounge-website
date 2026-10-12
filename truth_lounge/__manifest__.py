@@ -1,6 +1,6 @@
 {
     'name': 'Truth Website',
-    'version': '19.0.2.1.0',
+    'version': '19.0.2.2.0',
     'summary': 'Truth Lounge website, reservations and gallery with native Odoo commerce',
     'author': 'Spxcorp Limited', 'license': 'LGPL-3', 'category': 'Website',
     'depends': ['website_sale', 'website_event', 'mail'],

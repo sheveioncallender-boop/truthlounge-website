@@ -38,9 +38,9 @@ These are sample prices in the company's existing currency (TTD if that company 
 
 The six products have images, internal references beginning `TRUTH-DEMO-`, Food/Drinks website categories, Truth Demo Food/Drinks POS categories, and Kitchen/Bar preparation routing. They are published to the selected website and available in POS. Find them under **Truth Website → Demo Menu** or search products for `TRUTH-DEMO-`.
 
-To test, reload the POS catalog and add a food and a drink through the normal POS workflow. Select that register in **Truth Kitchen Display → Displays**. If POS or display category filters are enabled, include the new demo categories. For website tests, enable **Include confirmed website orders** on the display. Native order confirmation still determines when website orders appear. No test orders or payments are created automatically.
+To test, reload the POS catalog and add a food and a drink through the normal POS workflow. Select that register in **Truth Kitchen Display → Displays**. The upgrade includes the new demo categories in existing restricted POS menus. If preparation-display category filters are enabled, include the new demo categories there. For website tests, enable **Include confirmed website orders** on the display. Native order confirmation still determines when website orders appear. No test orders or payments are created automatically.
 
-Demo products are goods without inventory tracking. There are no stock balances, BOMs, recipes or automatic ingredient consumption. Existing products and register settings are not modified. Before real trading, unpublish/archive the demo products, or replace their names, prices, descriptions and photos with approved menu data. If a demo product has been used on an order, archive it rather than deleting it. Repeated setup does not overwrite edited demo products.
+Demo products are goods without inventory tracking. There are no stock balances, BOMs, recipes or automatic ingredient consumption. Existing non-demo products are not modified. For restricted POS menus, the demo categories are added to the allowed category selection. Before real trading, unpublish/archive the demo products, or replace their names, prices, descriptions and photos with approved menu data. If a demo product has been used on an order, archive it rather than deleting it. Repeated setup does not overwrite edited demo products.
 
 ## Fresh installation
 
@@ -65,6 +65,14 @@ Screens showing the same item share preparation progress. Kitchen and bar items 
 The display reads server-saved POS orders from the last 48 hours and source orders for open preparation items. Offline/unsynchronized edits appear after Odoo syncs. Selecting an existing register may show recent historical orders; review the queue before service. Website orders enter only after native sale confirmation. Old `/truth/kitchen` bookmarks now open the display list; live boards use `/truth/kitchen/<display_id>`.
 
 Grant staff **Preparation Display User** for operation or **Kitchen Display Manager** for configuration and preparation dismissal. Assign their ordinary native POS/Sales roles separately as appropriate. Administrator access is supported. Records are restricted by company. Dismissing preparation requires a reason and does not cancel/refund the native order.
+
+## Hero and mobile icons fix (19.0.2.2.0)
+
+Upgrade **Truth Website** after rebuilding. The homepage uses the bundled food photograph as a full-width hero, with responsive dark overlays for readable text. The official logo remains in the native navigation header.
+
+The cart and hamburger now use local gold SVG icons. The old solid-fill menu rule is removed and native masking is disabled for these icons. Mobile controls have explicit dark 46px touch targets; Odoo's original cart link, quantity badge, menu toggle and accessibility labels are retained. Kitchen workflow is unchanged. **Truth Demo Menu 19.0.1.1.0** repairs availability of the existing six demo products on install/upgrade. It sets them active, saleable and available in POS, and adds their categories to restricted POS category lists in their company without removing existing categories. Prices, images, orders, stock and payment settings are preserved. Upgrade Truth Demo Menu, then reload the POS browser tab; no cashier session closure is required by this patch.
+
+Source changes were checked against the repository. The workspace was unavailable for this patch, so the supplied screenshot and live browser rendering could not be inspected.
 
 ## Homepage photo and karaoke update (19.0.2.1.0)
 

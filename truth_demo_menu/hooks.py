@@ -52,4 +52,5 @@ def post_init_hook(env):
             'description_sale': item['description'],
             'website_description': '<p>%s</p>' % escape(item['description']),
         })
-    # No stock quantities, BOMs, taxes, fiscal positions, payments, orders or POS settings are changed.
+    env['product.template']._truth_enable_demo_pos_products()
+    # No stock quantities, BOMs, taxes, fiscal positions, payments or orders are changed.
