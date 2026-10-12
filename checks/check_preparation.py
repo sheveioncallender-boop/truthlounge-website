@@ -28,7 +28,7 @@ class FakeFields:
 sys.modules['odoo'] = types.SimpleNamespace(api=types.SimpleNamespace(model=lambda f: f),
     fields=FakeFields(), models=types.SimpleNamespace(Model=object, Constraint=lambda *a: None))
 sys.modules['odoo.exceptions'] = types.SimpleNamespace(AccessError=Error, UserError=Error)
-spec = importlib.util.spec_from_file_location('truth_kitchen_tested', Path(__file__).parents[1] / 'truth_lounge/models/kitchen.py')
+spec = importlib.util.spec_from_file_location('truth_kitchen_tested', Path(__file__).parents[1] / 'truth_kitchen_display/models/kitchen.py')
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 

@@ -1,89 +1,94 @@
-# Truth Lounge & Restaurant — Odoo 19 Community
+# Truth Lounge — Odoo 19 Community
 
-First implementation of the Truth website and preparation display by Spxcorp Limited.
+Two independently installable apps, using the supplied Truth Lounge & Restaurant artwork:
 
-## Native Odoo flow is preserved
+| App | Technical folder | Responsibility |
+| --- | --- | --- |
+| Truth Website | `truth_lounge` | Homepage, branding, native shop links, reservations and gallery |
+| Truth Kitchen Display | `truth_kitchen_display` | Display configuration, kitchen/bar screens and preparation history |
 
-This add-on does not override POS create/write/sync, checkout, payment processing, sales confirmation, invoicing, refunds, transfers, or stock valuation. It does not replace Odoo's native website header, account menu, cart, shop, checkout, event pages, or restaurant POS.
+Neither app depends on the other. Kitchen display requires native Restaurant POS and Sales; website requires native Website eCommerce and Website Events. No Enterprise preparation module is required.
 
-- Food & Drinks opens Odoo's native `/shop`. Products, variants, prices, pricelists, taxes, categories, publication and images remain standard Odoo records.
-- What's On opens Odoo's native `/event`. Add and publish real events in Odoo Events. Ticket sales require Odoo's native event e-commerce modules and a configured provider.
-- Website orders remain native sales orders. They are never converted into duplicate POS orders.
-- Restaurant orders remain native POS orders. Existing tables, sessions, cashier payment methods and fiscal positions stay intact.
-- Kitchen and bar preparation records are a separate display-only mirror. Advancing or dismissing an item cannot confirm/cancel/refund the source order, record a payment, invoice a customer, or move inventory.
-- Odoo decides when a website sale is confirmed under its configured payment and manual-confirmation rules. The display observes that state; it does not change it or treat a browser return URL as payment proof.
+## Upgrade an existing combined installation on Cloudpepper
 
-## Included
+1. Take a database backup and deploy this revision of the repository. Keep the repository root on the addons path.
+2. Restart/rebuild Odoo, then update the Apps list in developer mode.
+3. **Install Truth Kitchen Display first.** Its installation transfers ownership of the existing preparation model, fields, access groups, views and constraints. Ticket IDs, stages, revisions and history remain in place. Previously enabled registers are selected on the initial display.
+4. **Upgrade Truth Website**, which is the existing `truth_lounge` module under its new display name. Do not uninstall the original combined module. A migration guard blocks upgrading it first, because that could delete preparation metadata.
+5. Reload the browser. The apps are now **Truth Website** and **Truth Kitchen Display**.
+6. Open **Truth Kitchen Display → Displays**, open a configuration, choose its POS registers and station, save, then click **Open Display**.
+7. Open the website root `/`. A single-website database automatically receives the Truth homepage, uploaded artwork as its logo, navigation and social links. The one-time repair also runs on upgrade. For a database with multiple websites, select the intended site under **Truth Website → Website Branding** and click **Apply Truth branding and navigation**.
 
-- Responsive black/gold/ivory website using the supplied Truth brand artwork.
-- Home, Our Story, Private Events, Gallery, Visit/Contact, and Reservation Request pages.
-- Native shop, cart, checkout, customer portal and event listing, with scoped Truth button/header colours.
-- Staff-managed reservation and private-event requests. No automatic table allocation or capacity assumptions.
-- Staff-managed gallery photos, scoped to the selected website.
-- Combined, Kitchen-only and Bar-only display views at `/truth/kitchen`.
-- Stages: New → Acknowledged → Preparing → Ready → Completed.
-- Separate progress for food/drinks; product images, notes, quantity amendments, elapsed time and late-item highlighting.
-- New/amended order sounds, repeat alerts, volume/mute/test controls and full-screen mode.
-- Audit history, manager-only preparation dismissal with a reason, company rules and stale-screen protection.
+Do not run a blanket upgrade before installing the new kitchen module. Complete both steps before resuming service. Existing native POS/Sales/Inventory applications remain installed; the split does not uninstall them.
 
-## Installation on Cloudpepper
+## Fresh installation
 
-1. Connect this repository using the branch you deploy (`main`, or `rebuild` when provided).
-2. Ensure the repository root is on the add-ons path: it contains the `truth_lounge` module folder.
-3. Rebuild/restart the Odoo 19 Community instance. Update the Apps list and install **Truth Lounge — Restaurant Experience**.
-4. Dependencies use standard Community modules: Website eCommerce, Website Events, Restaurant POS, Sales/Stock, Purchases/Stock and Discuss. No Enterprise preparation-display dependency is used.
-5. As an administrator, open **Truth Lounge → Website Branding**, select the intended website and click **Apply Truth branding and navigation**.
-6. This activation sets that website's name, logo, social links and homepage `/truth`, then adds missing navigation entries. It leaves company details and existing products/orders unchanged. Review existing navigation in the native website editor if this is not a fresh website.
-7. Enter the verified contact number and opening hours on the same website form. They are deliberately blank initially. Confirm the address before launch.
-8. Grant staff **Truth Lounge → Preparation Display User**, or **Truth Manager** for reservations/gallery/dismissals. Grant their ordinary Odoo POS, Sales, Website or Events access separately as required.
+Install either or both apps from Apps. The website activates automatically when the database has one website. The kitchen app creates an initial screen with no registers selected; configure it before service.
 
-## Kitchen and bar setup
+## Kitchen display configuration
 
-1. In each relevant POS configuration, enable **Enable Truth kitchen/bar display**.
-2. On each food/drink product, set **Truth preparation station** to Kitchen or Bar. Leave this blank for event tickets, fees and other items that do not require preparation.
-3. Open `/truth/kitchen` while signed in. Choose the station for that device, then click **Enable sound**. Browsers require this interaction for audio.
-4. Staff continue using their existing native POS workflow. Like the Ohana display, polling reads the server-saved order snapshot; unsynchronised/offline edits cannot appear until Odoo syncs them. There is no new Send button or POS frontend patch.
-5. Polling is every five seconds. Recent native orders (last 48 hours) plus all source orders of open preparation items are checked. Enabling the display on an existing POS can therefore show recent orders; test activation timing before opening service.
-6. A preparation item is identified by source order, source line and station. Repeated polling updates the same ticket. Food and drinks advance independently.
-7. Quantity/product/note amendments resurface the affected item as **Updated order — check changes**. The displayed quantity is the latest total, not an instruction to remake the whole total. Kitchen staff should check what has already been prepared.
-8. Dismissal closes preparation work only. Any sale/POS cancellation, customer credit or refund must still be processed through the existing Odoo workflow.
-9. The display needs a network connection. When disconnected, it keeps the last displayed snapshot and clearly shows a connection warning. Standard Odoo POS offline operation is unaffected.
+Clicking **Truth Kitchen Display** opens **Displays**, not the live board. Each configuration has an **Open Display** button. A running display also has **Displays** and **Configuration** links.
 
-## Website launch setup
+Available settings:
 
-- Add actual menu items with prices, images and categories in native Odoo; publish approved products. No invented menu/prices, tax rates, hours, phone numbers or event dates are installed.
-- Configure delivery/pickup, payment provider(s), order confirmation, tax and stock rules using native Odoo. This module does not guess or change those settings.
-- The home page draws featured products from published, preparation-routed products. Until products are published, the product section is omitted and the menu button still opens the native shop.
-- Publish real events through Odoo Events. Install/configure the standard event ticket checkout modules if paid entry is needed.
-- Upload actual approved venue/food photos under **Truth Lounge → Website Gallery**. Until photos are published, Gallery links visitors to Truth's social pages.
-- Reservation requests are stored under **Truth Lounge → Reservations & Private Events**. Staff must monitor this screen and contact guests. This release does not automatically send booking-confirmation emails, accept deposits or allocate POS tables.
-- Reservations are entered in Trinidad & Tobago time and stored in UTC. Set staff user time zones appropriately.
-- Inventory and purchasing use native Odoo. Ingredient recipes, portions, bottle measurements, warehouses, opening balances and replenishment rules need the business's actual data and configuration. No automatic ingredient consumption logic is included.
-- The supplied square brand artwork is used intact. A clean transparent logo and real venue photography can improve the header and imagery later without changing the operating system.
+- Name, company, one or more POS registers, Kitchen/Bar/both, and optional POS category filters.
+- Optional confirmed website orders, using the native eCommerce app when installed. This includes websites in the selected company and does not require Truth Website.
+- Refresh interval, late-item highlighting, closed-item retention and product images.
+- Sound availability, initial volume and repeat interval. Set repeat to zero for new/amended-item alerts only. Browsers require **Enable sound** once per opened screen.
+- Labels for the five stages: New → Acknowledged → Preparing → Ready → Completed. Labels are customizable; the progression is fixed.
 
-## Validation and deployment status
+Set **Truth preparation station** on each food/drink product to Kitchen or Bar. Leave it empty for fees and items that need no preparation. The old register checkbox is retained internally for migration; register selection on the display is now the setting used for polling.
 
-Local checks cover Python syntax, XML parsing, manifest/file references, Odoo 19 inherited-view targets, JS syntax, native-flow isolation, and a runnable isolated preparation-mirroring test. Odoo integration tests are included under `truth_lounge/tests` for idempotency, independent stations, amendments, stale screens and access control.
+Screens showing the same item share preparation progress. Kitchen and bar items can advance independently. Tickets are identified by source order, source line and station, so repeated polling does not duplicate them. Amendments reopen the affected item with an update warning; the quantity is the new total, not an instruction to remake the entire total.
 
-This workspace has no runnable Odoo/PostgreSQL instance. Installation, actual QWeb rendering, browser layout and end-to-end POS/payment workflows must be verified on the target Odoo 19 Community test instance before production use. The code is not represented as production-validated or already deployed.
+The display reads server-saved POS orders from the last 48 hours and source orders for open preparation items. Offline/unsynchronized edits appear after Odoo syncs. Selecting an existing register may show recent historical orders; review the queue before service. Website orders enter only after native sale confirmation. Old `/truth/kitchen` bookmarks now open the display list; live boards use `/truth/kitchen/<display_id>`.
 
-Suggested staging test:
+Grant staff **Preparation Display User** for operation or **Kitchen Display Manager** for configuration and preparation dismissal. Assign their ordinary native POS/Sales roles separately as appropriate. Administrator access is supported. Records are restricted by company. Dismissing preparation requires a reason and does not cancel/refund the native order.
 
-1. Install the add-on and apply branding to the intended website. Check mobile/desktop header, native cart and checkout.
-2. Send a normal dine-in POS order with food and drinks through the existing workflow; check independent display progress, edits and cancellation.
-3. Complete a native website checkout in the provider's test mode. Verify one native sale, correct payment/accounting/stock behavior, and preparation only after confirmation.
-4. Verify reservations, gallery publication, station routing and restricted access with real staff roles.
-5. Verify refunds in native Odoo; preparation dismissal must not generate financial changes.
+## Website configuration
 
-For automated Odoo integration tests on a disposable test database:
+- The native Odoo header, mobile navigation, account menu, cart, shop, checkout and events remain in use. Truth colours and contact text are applied to the native header; default placeholder contact content is removed for branded sites.
+- Homepage `/truth` is selected using Odoo's `homepage_url`; no replacement root controller or checkout flow is installed. Open Website uses `/` so Odoo performs its normal website selection.
+- The supplied square brand artwork is used intact in the native logo field and website imagery. It is not a newly drawn substitute. Upload a different official logo through native Website settings if needed.
+- Add the verified phone number, opening hours and address under **Website Branding**. No phone number, menu, price, event date or opening hour is invented.
+- Add and publish actual products in native eCommerce. Featured products on the homepage no longer depend on preparation routing or installation of the kitchen app.
+- Publish events in native Events. Paid event checkout requires native event-sale modules and a configured payment provider.
+- Upload approved photos under **Truth Website → Website Gallery**. Until photos are published, Gallery links to the social pages.
+- Reservation/private-event requests are under **Truth Website → Reservations & Private Events**. Staff must review availability and contact guests; there are no automatic table allocations, deposits or confirmation emails. Guest times use Trinidad & Tobago time and are stored in UTC.
+- Assign **Truth Website Manager** for reservations/gallery. Existing Truth managers receive this role during migration. Website editor access is configured separately using native Odoo permissions.
+- Setup does not change company identity, payment providers, tax rules, inventory, existing products or orders. Subsequent ordinary upgrades do not reset the logo/navigation after the one-time version-2 activation. The explicit branding button reapplies the supplied defaults.
+
+## Native Odoo flow
+
+There are no POS create/write/sync hooks, POS frontend patches, checkout overrides, sales-confirmation overrides, or payment/accounting/stock lifecycle changes. The display polls source records and writes only preparation tickets. Website orders remain native sales orders; they are not copied into POS. Tables, sessions, receipts, payments, refunds, invoicing and inventory continue through Odoo's existing flows.
+
+## Verification
+
+Run the local checks:
 
 ```bash
-odoo -d truth_test --addons-path=/path/to/odoo/addons,/path/to/this/repo -i truth_lounge --test-enable --test-tags /truth_lounge --stop-after-init
+python checks/check_preparation.py
+python checks/check_migration.py
+python checks/check_structure.py
+node --check truth_kitchen_display/static/src/js/kitchen.js
 ```
 
-## Provenance
+These cover preparation idempotency/amendments/removals, metadata ownership transfer and ticket identity, module independence, XML/manifest references, Python syntax and JavaScript syntax. The migration fixture executes the hook's SQL against a small SQLite metadata fixture, not a live Odoo database.
 
-Visual source: user-supplied Truth Lounge & Restaurant artwork and confirmed public social/location references.
-Preparation architecture: the existing Ohana/Fuze project approach, with independent source polling and Truth-specific presentation. No other restaurant's branding, contacts, menus, prices or customer data is copied.
+Odoo integration tests are included under `truth_kitchen_display/tests`. On a disposable Odoo 19 Community database:
 
-License: LGPL-3 for code; supplied brand artwork remains with its owner.
+```bash
+odoo -d truth_test --addons-path=/path/to/odoo/addons,/path/to/this/repo -i truth_kitchen_display,truth_lounge --test-enable --test-tags /truth_kitchen_display --stop-after-init
+```
+
+This workspace has no runnable Odoo/PostgreSQL instance. Actual installation, migration, QWeb rendering and full POS/payment workflows have not been validated live. On a staging copy, follow the upgrade order above and check:
+
+1. Existing preparation IDs/stages/history and staff access survive the split.
+2. Kitchen app opens configuration; each screen filters the selected company/register/categories/station.
+3. Root website shows the branded homepage and uploaded logo, with native mobile header/cart/checkout.
+4. Normal POS edits/cancellation, confirmed website sales, preparation amendments and concurrent screens behave correctly.
+5. Preparation advancement/dismissal does not change financial or stock records.
+
+Cloudpepper deployment remains with the site owner.
+
+Code: LGPL-3. Supplied artwork remains with its owner.

@@ -1,1 +1,1 @@
-from . import configuration, kitchen, orders, booking
+from . import configuration, booking

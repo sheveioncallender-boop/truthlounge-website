@@ -16,7 +16,7 @@ class TruthWebsite(http.Controller):
 
     @http.route('/truth', type='http', auth='public', website=True, sitemap=True)
     def home(self, **kwargs):
-        products = request.env['product.template'].search(request.website.sale_product_domain() + [('truth_station', '!=', False)], limit=4)
+        products = request.env['product.template'].search(request.website.sale_product_domain() + [('is_published', '=', True)], limit=4)
         return self._page('home', products=products)
 
     @http.route('/truth/about', type='http', auth='public', website=True, sitemap=True)
@@ -78,41 +78,3 @@ class TruthWebsite(http.Controller):
             'website_id': request.website.id, 'requested_at': requested, 'guests': guests})
         request.session['truth_booking_last'] = time.time()
         return self._page('reserve', error=False, values={}, submitted=True)
-
-
-class TruthKitchen(http.Controller):
-    @staticmethod
-    def _check():
-        request.env['truth.ticket']._require_operator()
-
-    @http.route('/truth/kitchen', type='http', auth='user', methods=['GET'])
-    def kitchen(self, **kwargs):
-        self._check()
-        return request.render('truth_lounge.kitchen')
-
-    @http.route('/truth/kitchen/data', type='jsonrpc', auth='user', methods=['POST'])
-    def data(self, **kwargs):
-        self._check()
-        Ticket = request.env['truth.ticket']
-        errors = Ticket._sync_sources()
-        cutoff = fields.Datetime.now() - timedelta(minutes=30)
-        tickets = Ticket.search([('company_id', 'in', request.env.companies.ids), '|', ('stage', 'not in', ['completed', 'cancelled']), ('write_date', '>=', cutoff)])
-        return {'ok': True, 'syncErrors': errors, 'canCancel': request.env.user.has_group('truth_lounge.group_manager') or request.env.user.has_group('base.group_system'),
-            'tickets': [{'id': t.id, 'reference': t.name, 'source': 'Website' if t.sale_order_id else 'POS',
-                'station': t.station, 'product': t.product_name, 'qty': t.quantity, 'note': t.note or '',
-                'table': t.table_name or 'Counter', 'stage': t.stage, 'revision': t.revision, 'amended': t.amended,
-                'created': fields.Datetime.to_string(t.create_date), 'reason': t.cancellation_reason or '',
-                'image': '/web/image/product.product/%s/image_128' % t.product_id.id if t.product_id else ''} for t in tickets]}
-
-    @http.route('/truth/kitchen/step', type='jsonrpc', auth='user', methods=['POST'])
-    def step(self, ticket_id=None, revision=None, cancel_reason=None, **kwargs):
-        self._check()
-        try:
-            ticket_id, revision = int(ticket_id), int(revision)
-        except (ValueError, TypeError):
-            raise UserError('Invalid ticket.')
-        ticket = request.env['truth.ticket'].search([('id', '=', ticket_id), ('company_id', 'in', request.env.companies.ids)], limit=1)
-        if not ticket:
-            raise UserError('Ticket not found.')
-        ticket.action_step(revision, cancel_reason)
-        return {'ok': True}

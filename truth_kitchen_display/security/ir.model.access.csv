@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+ticket_user,Preparation read,model_truth_ticket,group_operator,1,0,0,0
+ticket_manager,Preparation manager,model_truth_ticket,group_manager,1,0,0,0
+ticket_admin,Preparation admin,model_truth_ticket,base.group_system,1,1,1,1
+display_user,Display user,model_truth_display,group_operator,1,0,0,0
+display_manager,Display manager,model_truth_display,group_manager,1,1,1,1
+display_admin,Display admin,model_truth_display,base.group_system,1,1,1,1

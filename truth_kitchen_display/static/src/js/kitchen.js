@@ -1,13 +1,15 @@
 (() => {
   'use strict';
   const $ = (id) => document.getElementById(id);
-  const stages = [['new','New'],['acknowledged','Acknowledged'],['preparing','Preparing'],['ready','Ready'],['completed','Completed'],['cancelled','Dismissed']];
+  let stages = [['new','New'],['acknowledged','Acknowledged'],['preparing','Preparing'],['ready','Ready'],['completed','Completed'],['cancelled','Dismissed']];
+  const displayId = Number(document.body.dataset.displayId);
+  const preferenceKey = `truthDisplay:${displayId}`;
   const next = {new:'Acknowledge', acknowledged:'Start preparing', preparing:'Mark ready', ready:'Complete'};
-  const state = {tickets:[], seen:new Set(), station:localStorage.getItem('truthStation') || 'all', sound:false, volume:Number(localStorage.getItem('truthVolume') || 60), canCancel:false, started:false};
+  const state = {tickets:[], seen:new Set(), station:localStorage.getItem(preferenceKey+':station') || 'all', sound:false, volume:60, settings:{refreshSeconds:5, lateMinutes:15, repeatSeconds:20, soundEnabled:true}, canCancel:false, started:false};
   let audio, busy = false, lastAlert = 0, requestId = 0;
   const escape = (v) => String(v ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   async function rpc(path, params={}) {
-    const response = await fetch(path, {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({jsonrpc:'2.0', method:'call', id:++requestId, params})});
+    const response = await fetch(path, {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({jsonrpc:'2.0', method:'call', id:++requestId, params:{...params,display_id:displayId}})});
     if (!response.ok) throw new Error('Connection interrupted. Check that you are signed in.');
     const data = await response.json();
     if (data.error) throw new Error(data.error.data?.message || data.error.message || 'Request failed.');
@@ -15,7 +17,7 @@
   }
   function message(text) { $('error').textContent=text; $('error').style.display='block'; }
   function beep() {
-    if (!state.sound || !audio || audio.state !== 'running') return;
+    if (!state.settings.soundEnabled || !state.sound || !audio || audio.state !== 'running') return;
     const t = audio.currentTime;
     [660,880].forEach((frequency,index) => {
       const o = audio.createOscillator(), g = audio.createGain();
@@ -29,13 +31,13 @@
   function relevant(ticket) { return state.station==='all' || state.station===ticket.station; }
   function age(ticket) { return Math.max(0, Math.floor((Date.now()-new Date(ticket.created.replace(' ','T')+'Z'))/60000)); }
   function card(t) {
-    return `<article class="ticket ${age(t)>=15 && next[t.stage]?'late':''} ${t.amended?'amended':''}">
+    return `<article class="ticket ${age(t)>=state.settings.lateMinutes && next[t.stage]?'late':''} ${t.amended?'amended':''}">
       <div class="ref"><span>${escape(t.reference)}</span><span>${age(t)}m</span></div>
       <div class="meta">${escape(t.source)} · ${escape(t.table)}<br>${t.station==='bar'?'BAR':'KITCHEN'}</div>
       ${t.amended?'<div class="amend">UPDATED ORDER — CHECK CHANGES</div>':''}
       <div class="item">${$('images').checked && t.image?`<img src="${escape(t.image)}" alt="" loading="lazy">`:''}<h3>${escape(t.qty)} × ${escape(t.product)}</h3></div>
       ${t.note?`<p>${escape(t.note)}</p>`:''}${t.reason?`<p>${escape(t.reason)}</p>`:''}
-      ${next[t.stage]?`<button data-ticket="${t.id}" data-revision="${t.revision}">${next[t.stage]}</button>`:''}
+      ${next[t.stage]?`<button data-ticket="${t.id}" data-revision="${t.revision}">${escape('→ ' + (stages[stages.findIndex(([code])=>code===t.stage)+1]?.[1] || 'Next'))}</button>`:''}
       ${state.canCancel && next[t.stage]?`<button class="dismiss" data-dismiss="${t.id}" data-revision="${t.revision}">Dismiss preparation item</button>`:''}</article>`;
   }
   function render() {
@@ -43,7 +45,7 @@
     $('board').style.gridTemplateColumns=`repeat(${visible.length}, minmax(215px, 1fr))`;
     $('board').innerHTML = visible.map(([code,label])=>{
       const tickets=state.tickets.filter(t=>t.stage===code && relevant(t));
-      return `<section class="kds-column"><h2>${label}<span>${tickets.length}</span></h2>${tickets.length?tickets.map(card).join(''):'<p class="empty">No items</p>'}</section>`;
+      return `<section class="kds-column"><h2>${escape(label)}<span>${tickets.length}</span></h2>${tickets.length?tickets.map(card).join(''):'<p class="empty">No items</p>'}</section>`;
     }).join('');
     document.querySelectorAll('[data-station]').forEach(b=>b.classList.toggle('active',b.dataset.station===state.station));
   }
@@ -52,6 +54,18 @@
     busy=true;
     try {
       const data=await rpc('/truth/kitchen/data');
+      state.settings=data.settings; stages=data.settings.stages;
+      $('display-name').textContent=data.settings.name;
+      if (!state.started) {
+        state.started=true;
+        state.volume=Number(localStorage.getItem(preferenceKey+':volume') ?? data.settings.volume);
+        $('volume').value=state.volume;
+        $('images').checked=data.settings.showImages;
+      }
+      if (data.settings.station!=='all') state.station=data.settings.station;
+      document.querySelector('.kds-tabs').hidden=data.settings.station!=='all';
+      for (const id of ['sound-start','sound-test']) $(id).hidden=!data.settings.soundEnabled;
+      $('volume').closest('label').hidden=!data.settings.soundEnabled;
       let fresh=false;
       for (const ticket of data.tickets) {
         const key=`${ticket.id}:${ticket.revision}`;
@@ -59,17 +73,17 @@
         state.seen.add(key);
       }
       state.tickets=data.tickets; state.canCancel=data.canCancel;
-      if (fresh || (Date.now()-lastAlert>20000 && state.tickets.some(t=>t.stage==='new' && relevant(t)))) beep();
+      if (fresh || (state.settings.repeatSeconds>0 && Date.now()-lastAlert>state.settings.repeatSeconds*1000 && state.tickets.some(t=>t.stage==='new' && relevant(t)))) beep();
       $('status').textContent=data.syncErrors?'Some orders could not sync — contact your administrator':`Updated ${new Date().toLocaleTimeString()}`;
       if (!data.syncErrors) $('error').style.display='none';
       render();
     } catch(error) { $('status').textContent='Disconnected — showing last received orders'; message(error.message); }
     finally {busy=false;}
   }
-  document.querySelectorAll('[data-station]').forEach(b=>b.addEventListener('click',()=>{state.station=b.dataset.station;localStorage.setItem('truthStation',state.station);render();}));
+  document.querySelectorAll('[data-station]').forEach(b=>b.addEventListener('click',()=>{state.station=b.dataset.station;localStorage.setItem(preferenceKey+':station',state.station);render();}));
   $('images').addEventListener('change',render); $('closed').addEventListener('change',render);
   $('volume').value=state.volume;
-  $('volume').addEventListener('input',()=>{state.volume=Number($('volume').value);localStorage.setItem('truthVolume',String(state.volume));});
+  $('volume').addEventListener('input',()=>{state.volume=Number($('volume').value);localStorage.setItem(preferenceKey+':volume',String(state.volume));});
   $('sound-start').addEventListener('click',async()=>{
     try {audio ||= new (window.AudioContext || window.webkitAudioContext)();await audio.resume();state.sound=!state.sound;$('sound-start').textContent=state.sound?'Mute sound':'Enable sound';if(state.sound)beep();}
     catch {message('This browser could not enable sound. Try another supported browser.');}
@@ -84,5 +98,6 @@
     try {await rpc('/truth/kitchen/step',{ticket_id:Number(button.dataset.ticket||button.dataset.dismiss),revision:Number(button.dataset.revision),cancel_reason:reason});await refresh();}
     catch(error){message(error.message);button.disabled=false;}
   });
-  refresh();setInterval(refresh,5000);
+  async function poll() { await refresh(); setTimeout(poll,state.settings.refreshSeconds*1000); }
+  poll();
 })();

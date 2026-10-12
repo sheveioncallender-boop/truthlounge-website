@@ -37,7 +37,7 @@ class TruthTicket(models.Model):
     _source_unique = models.Constraint('UNIQUE(source_key)', 'This preparation item already exists.')
 
     def _require_operator(self):
-        if not (self.env.user.has_group('truth_lounge.group_operator') or self.env.user.has_group('base.group_system')):
+        if not (self.env.user.has_group('truth_kitchen_display.group_operator') or self.env.user.has_group('base.group_system')):
             raise AccessError('You do not have access to the Truth preparation display.')
         self.check_access('read')
         if any(t.company_id not in self.env.companies for t in self):
@@ -51,7 +51,7 @@ class TruthTicket(models.Model):
         if self.revision != expected_revision:
             raise UserError('This item changed on another screen. Refresh and try again.')
         if cancel_reason is not None:
-            if not (self.env.user.has_group('truth_lounge.group_manager') or self.env.user.has_group('base.group_system')):
+            if not (self.env.user.has_group('truth_kitchen_display.group_manager') or self.env.user.has_group('base.group_system')):
                 raise AccessError('A Truth manager must cancel preparation items.')
             reason = str(cancel_reason).strip()[:240]
             if not reason or self.stage in ('completed', 'cancelled'):
@@ -67,7 +67,7 @@ class TruthTicket(models.Model):
 
     @api.model
     def _reconcile(self, order, source, lines):
-        # Only called by trusted order hooks; clients cannot call private ORM methods.
+        # Only called by the display poller; clients cannot call private ORM methods.
         # Serialize only display synchronization, never lock or write native order rows.
         self.env.cr.execute('SELECT pg_advisory_xact_lock(%s, %s)', [7901 if source == 'pos' else 7902, order.id])
         Ticket = self.sudo().with_company(order.company_id)
@@ -113,33 +113,37 @@ class TruthTicket(models.Model):
 
 
     @api.model
-    def _sync_sources(self):
+    def _sync_sources(self, display):
         """Ohana-style polling: read native orders; write only display tickets.
 
         No POS, checkout, payment, stock or accounting lifecycle overrides.
         A failure here does not participate in the cashier's transaction.
         """
         self._require_operator()
-        companies = self.env.companies.ids
+        display.ensure_one()
+        display.check_access('read')
+        companies = [display.company_id.id]
         cutoff = fields.Datetime.now() - timedelta(days=2)
         Ticket = self.sudo()
-        open_tickets = Ticket.search([('company_id', 'in', companies), ('stage', 'not in', ['completed', 'cancelled'])])
+        open_tickets = Ticket.search(display._ticket_domain() + [('stage', 'not in', ['completed', 'cancelled'])])
         POS = self.env['pos.order'].sudo()
         Sale = self.env['sale.order'].sudo()
-        pos_orders = POS.search([('company_id', 'in', companies), ('config_id.truth_kds_enabled', '=', True), ('date_order', '>=', cutoff)])
+        pos_orders = POS.search([('company_id', 'in', companies), ('config_id', 'in', display.pos_config_ids.ids), ('date_order', '>=', cutoff)])
         pos_orders |= open_tickets.pos_order_id
-        sales = Sale.search([('company_id', 'in', companies), ('website_id.truth_enabled', '=', True), ('state', '=', 'sale'), ('date_order', '>=', cutoff)])
+        sales = Sale.browse()
+        if display.include_website_orders and 'website_id' in Sale._fields:
+            sales = Sale.search([('company_id', 'in', companies), ('website_id', '!=', False), ('state', '=', 'sale'), ('date_order', '>=', cutoff)])
         sales |= open_tickets.sale_order_id
         errors = 0
         for source, orders in [('pos', pos_orders), ('sale', sales)]:
             for order in orders:
                 try:
                     with self.env.cr.savepoint():
-                        if order.state == 'cancel' or (source == 'pos' and not order.config_id.truth_kds_enabled):
+                        if order.state == 'cancel':
                             Ticket._cancel_source(order, source)
                         elif source == 'pos':
                             Ticket._reconcile(order, source, order.lines)
-                        elif order.state == 'sale' and order.website_id.truth_enabled:
+                        elif order.state == 'sale':
                             Ticket._reconcile(order, source, order.order_line.filtered(lambda l: not l.display_type))
                         else:
                             Ticket._cancel_source(order, source)

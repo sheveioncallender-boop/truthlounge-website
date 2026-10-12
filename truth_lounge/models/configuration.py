@@ -1,5 +1,5 @@
 import base64
-from odoo import fields, models, tools
+from odoo import api, Command, fields, models, tools
 
 
 class Website(models.Model):
@@ -38,20 +38,28 @@ class Website(models.Model):
         return {'type': 'ir.actions.act_url', 'url': '/truth', 'target': 'self'}
 
 
+    @api.model
+    def _setup_truth_defaults(self):
+        """Activate on single-site installs/upgrades; don't guess on multi-site databases."""
+        websites = self.sudo().search([])
+        target = websites.filtered('truth_enabled')
+        if not target and len(websites) == 1:
+            target = websites
+        for website in target:
+            # One-time activation also repairs the original release's missing homepage/logo.
+            key = 'truth_lounge.branding_v2.%s' % website.id
+            if not self.env['ir.config_parameter'].sudo().get_param(key):
+                website.action_setup_truth()
+                self.env['ir.config_parameter'].sudo().set_param(key, '1')
+        old_managers = self.env.ref('truth_kitchen_display.group_manager', raise_if_not_found=False)
+        if old_managers:
+            self.env.ref('truth_lounge.group_website_manager').sudo().write({
+                'user_ids': [Command.link(user.id) for user in old_managers.all_user_ids]})
+
+
 class WebsiteMenu(models.Model):
     _inherit = 'website.menu'
     truth_website_id = fields.Many2one('website', ondelete='cascade')
-
-
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
-    truth_station = fields.Selection([('kitchen', 'Kitchen'), ('bar', 'Bar')], string='Truth preparation station',
-        help='Leave empty for items that do not need preparation. Used for both POS and confirmed website sales.')
-
-
-class PosConfig(models.Model):
-    _inherit = 'pos.config'
-    truth_kds_enabled = fields.Boolean('Enable Truth kitchen/bar display', default=False)
 
 
 class TruthGallery(models.Model):
